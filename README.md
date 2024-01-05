@@ -1,8 +1,10 @@
 # About the Project 
 
 - This project focused on performing **data exploration in SQL Server** with the supplementation of **Microsoft Power BI** to visualise patterns and trends.
-- The project included intermediate/advanced SQL techniques such as **Stored Procedures, Views, Temp Tables, Nested CTE's** - **please note that some techniques were purely used in this project to gain compotency in the particular skill and thus their application in this project may be questionable to users with greater expertise in SQL **
+- The project included intermediate/advanced SQL techniques such as **Stored Procedures, Views, Temp Tables, Nested CTE's**
 - The dataset used was provided by [Kaggle]() - currently experience troubles sourcing the data link.
+
+**> Please note that some techniques were purely used in this project to gain compotency in the particular skill and thus their application in this project may be questionable to users with greater expertise in SQL**
 
 # Methodology
 
