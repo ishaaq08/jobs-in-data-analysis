@@ -20,11 +20,11 @@ After an initial analysis of the dataset **5 questions** were created. It was th
 - LAG() window function to calculate % change.
 - Nested CTE's to efficiently query subsets of data and overcome hinderences regarding the prohibition of the use of aggregate functions in window functions.
 
-## Insight 4 - What is the association between company size and experienced professionals e.g. does a smaller company have less experienced positions?
+### Insight 4 - What is the association between company size and experienced professionals e.g. does a smaller company have less experienced positions?
 - Temp table to perform complex calculations and store intermediate results.
 - Stored Procedures to enhance query performance - calculate the total number of job positions for different company sizes whilst minimising repetitive code. 
 
-## Insight 5 - What is the association between company size and work setting?
+### Insight 5 - What is the association between company size and work setting?
 - Views to store intermediate results and further query the subset of data. 
 
 # Conclusions
