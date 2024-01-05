@@ -146,7 +146,7 @@ FROM
 
 GO
 
-	-- METHOD 1
+	-- METHOD 1 > Using nested CTE's
 
 -- CTE 1
 WITH cte_sal_by_exp (job_category, experience_level, avg_sal_usd)
@@ -185,14 +185,20 @@ SELECT
 FROM 
 	cte_sal_by_exp_with_lag
 
-	-- METHOD 2
-
 
 -- 4) What is the association between company size and experienced professionals e.g. does a smaller company have less experienced positions?
 
 GO
 
 	-- Creating temporary table
+
+
+IF OBJECT_ID(N'tempdb..#job_temp_table') IS NOT NULL
+BEGIN
+DROP TABLE #job_temp_table
+END 
+
+GO 
 
 CREATE TABLE #job_temp_table(
 company_size VARCHAR(1),
@@ -202,12 +208,12 @@ num_of_pos INT
 
 	-- Inserting data into the temporary table
 
+INSERT INTO 
+	#job_temp_table
 SELECT 
 	company_size,
 	experience_level,
 	COUNT(*) AS num_of_pos
-INTO 
-	#job_temp_table
 FROM 
 	job
 GROUP BY 
@@ -265,6 +271,11 @@ WHERE
 	-- Simplifying this entire process with a Stored Procedure
 
 GO 
+
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[sp_job_proc]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [sp_job_proc]
+
+GO
 
 CREATE PROC sp_job_proc 
 	(
@@ -330,4 +341,22 @@ ORDER BY
 
 -- 5) What is the association between company size and employment type?
 
+	-- Employment type: Full-time, Freelance, Contract, Part-time 
+	-- Work setting: In-person, Hybrid, Remote
 
+SELECT 
+	company_size,
+	employment_type,
+	COUNT(*) AS num_of_pos
+FROM 
+	job
+GROUP BY 
+	company_size, 
+	employment_type
+ORDER BY 
+	CASE company_size
+		WHEN 'S' THEN 0
+		WHEN 'M' THEN 1
+		WHEN 'L' THEN 2
+	END,
+	num_of_pos DESC
