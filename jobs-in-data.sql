@@ -146,6 +146,8 @@ FROM
 
 GO
 
+	-- METHOD 1
+
 -- CTE 1
 WITH cte_sal_by_exp (job_category, experience_level, avg_sal_usd)
 AS
@@ -183,9 +185,149 @@ SELECT
 FROM 
 	cte_sal_by_exp_with_lag
 
+	-- METHOD 2
+
 
 -- 4) What is the association between company size and experienced professionals e.g. does a smaller company have less experienced positions?
 
+GO
 
+	-- Creating temporary table
+
+CREATE TABLE #job_temp_table(
+company_size VARCHAR(1),
+experience_level VARCHAR(20),
+num_of_pos INT
+)
+
+	-- Inserting data into the temporary table
+
+SELECT 
+	company_size,
+	experience_level,
+	COUNT(*) AS num_of_pos
+INTO 
+	#job_temp_table
+FROM 
+	job
+GROUP BY 
+	company_size,
+	experience_level
+
+	-- Viewing and ordering the data in the temporary table
+
+SELECT 
+	* 
+FROM 
+	#job_temp_table
+ORDER BY 
+	CASE company_size
+		WHEN 'S' THEN 0
+		WHEN 'M' THEN 1
+		WHEN 'L' THEN 2
+	END,
+	CASE experience_level 
+		WHEN 'Entry-level' THEN 1
+		WHEN 'Mid-level' THEN 2
+		WHEN 'Senior' THEN 3
+		WHEN 'Executive' THEN 4
+	END
+
+	-- Filter by 'S' company
+
+SELECT 
+	*,
+	SUM(num_of_pos)
+FROM 
+	#job_temp_table
+WHERE 
+	company_size = 'S'
+
+	-- Filter by 'M' company 
+
+SELECT 
+	*,
+	SUM(num_of_pos)
+FROM 
+	#job_temp_table
+WHERE 
+	company_size = 'M'
+
+	-- Filter by 'L' company
+
+SELECT 
+	SUM(num_of_pos)
+FROM 
+	#job_temp_table
+WHERE 
+	company_size = 'L'
+
+	-- Simplifying this entire process with a Stored Procedure
+
+GO 
+
+CREATE PROC sp_job_proc 
+	(
+	@comp_size VARCHAR(1),
+	@result INT OUTPUT
+	)
+AS 
+BEGIN 
+	SELECT 
+		@result = SUM(num_of_pos)
+	FROM 
+		#job_temp_table
+	WHERE 
+		company_size = @comp_size
+END
+
+GO 
+
+	-- Assigning Stored Procedure outputs to corresponding variables 
+
+DECLARE @sum_comp_s INT
+EXEC 
+	sp_job_proc 
+	@comp_size = 'S',
+	@result = @sum_comp_s OUTPUT
+
+DECLARE @sum_comp_m INT
+EXEC 
+	sp_job_proc 
+	@comp_size = 'M',
+	@result = @sum_comp_m OUTPUT
+
+DECLARE @sum_comp_l INT
+EXEC 
+	sp_job_proc 
+	@comp_size = 'L',
+	@result = @sum_comp_l OUTPUT
+
+
+	-- Creating the new column 
+
+SELECT 
+	*,
+	CASE company_size
+		WHEN 'S' THEN CAST((CAST(num_of_pos AS DECIMAL(5,2))/@sum_comp_s)*100 AS DECIMAL(5,2))
+		WHEN 'M' THEN CAST((CAST(num_of_pos AS DECIMAL)/@sum_comp_m)*100 AS DECIMAL (5,2))
+		WHEN 'L' THEN CAST((CAST(num_of_pos AS DECIMAL)/@sum_comp_l)*100 AS DECIMAL (5,2))
+	END as ratio
+FROM 
+	#job_temp_table
+ORDER BY 
+	CASE company_size
+		WHEN 'S' THEN 0
+		WHEN 'M' THEN 1
+		WHEN 'L' THEN 2
+	END,
+	CASE experience_level 
+		WHEN 'Entry-level' THEN 1
+		WHEN 'Mid-level' THEN 2
+		WHEN 'Senior' THEN 3
+		WHEN 'Executive' THEN 4
+	END
 
 -- 5) What is the association between company size and employment type?
+
+
