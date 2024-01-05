@@ -4,7 +4,7 @@
 - The project included intermediate/advanced SQL techniques such as **Stored Procedures, Views, Temp Tables, Nested CTE's**
 - The dataset used was provided by [Kaggle]() - currently experience troubles sourcing the data link.
 
-**> Please note that some techniques were purely used in this project to gain compotency in the particular skill and thus their application in this project may be questionable to users with greater expertise in SQL**
+**> Please note that some techniques were purely used in this project to gain competency in the particular skill and thus their application in this project may be questionable to users with greater expertise in SQL**
 
 # Methodology
 
